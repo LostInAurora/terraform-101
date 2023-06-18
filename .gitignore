@@ -2,3 +2,5 @@
 *_rsa
 *.key
 *.tfstate
+*.backup
+*.idea
