@@ -1,1 +1,4 @@
 .terraform*
+*_rsa
+*.key
+*.tfstate
