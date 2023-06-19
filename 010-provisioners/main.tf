@@ -164,4 +164,38 @@ resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
   boot_diagnostics {
     storage_account_uri = azurerm_storage_account.my_storage_account.primary_blob_endpoint
   }
+  provisioner "local-exec" {
+    command = "echo ${self.private_ip_address} >> private_ip.txt"
+  }
+
+  connection {
+    host        = self.public_ip_address
+    type        = "ssh"
+    user        = "azureuser"
+    private_key = tls_private_key.example_ssh.private_key_pem
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "echo ${self.private_ip_address} >> private_ip.txt"
+    ]
+  }
+
+  provisioner "file" {
+    content     = self.private_ip_address
+    destination = "/home/azureuser/file.txt"
+  }
 }
+
+# define null_resource to curl nginx 
+# resource "null_resource" "test_nginx" {
+#   provisioner "local-exec" {
+#     command = "curl ${azurerm_public_ip.my_terraform_public_ip.ip_address} | tr -d "
+#   }
+
+#   triggers = {
+#     always_run = timestamp()
+#   }
+
+#   depends_on = [azurerm_linux_virtual_machine.my_terraform_vm]
+# }
